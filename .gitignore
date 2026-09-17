@@ -16,12 +16,12 @@ build/
 !/.mvn/wrapper/maven-wrapper.jar
 
 
-.default_images/
-.uploads/
-.brand_logos/
-.category_images/
-.product_images/
-.user_photos/
+default_images/
+uploads/
+brand_logos/
+category_images/
+product_images/
+user_photos/
 
 
 
