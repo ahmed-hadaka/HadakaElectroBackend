@@ -1,4 +1,4 @@
-package com.hadaka_electro.customer.sitting;
+package com.hadaka_electro.customer.sitting.repository;
 
 import com.hadaka_electro.common.entities.sitting.Sitting;
 import com.hadaka_electro.common.entities.sitting.SittingCategory;

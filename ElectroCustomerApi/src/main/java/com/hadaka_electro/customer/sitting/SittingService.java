@@ -2,6 +2,7 @@ package com.hadaka_electro.customer.sitting;
 
 import com.hadaka_electro.common.entities.sitting.Sitting;
 import com.hadaka_electro.common.entities.sitting.SittingCategory;
+import com.hadaka_electro.customer.sitting.repository.SittingsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
