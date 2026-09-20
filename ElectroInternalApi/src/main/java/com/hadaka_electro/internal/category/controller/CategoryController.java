@@ -76,7 +76,7 @@ public class CategoryController {
         return ResponseEntity.ok("Category with id: " + id + " has been deleted.");
     }
 
-    @PatchMapping("/update-enable-status/{id}")
+    @PatchMapping("/toggle-enable-status/{id}")
     public ResponseEntity<String> updateEnableStatus(@PathVariable int id) throws ObjectNotFoundException {
         String status = categoryService.updateEnableStatus(id);
         return ResponseEntity.ok("Category id: " + id + " has been " + status + " successfully.");
