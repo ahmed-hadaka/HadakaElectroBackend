@@ -12,7 +12,7 @@
 4. [Product Endpoints](#product-endpoints)
 5. [User Endpoints](#user-endpoints)
 6. [Customer Endpoints](#customer-endpoints)
-7. [Sittings Endpoints](#sittings-endpoints)
+7. [settings Endpoints](#settings-endpoints)
 8. [Data Types Reference](#data-types-reference)
 
 ---
@@ -976,13 +976,13 @@
 
 ---
 
-## Sittings Endpoints
+## settings Endpoints
 
-### Base URL: `/sittings`
+### Base URL: `/settings`
 
-#### 1. Get General and Currency Sittings
+#### 1. Get General and Currency settings
 
-- **Endpoint:** `GET /sittings/general`
+- **Endpoint:** `GET /settings/general`
 - **Description:** Retrieve general settings and available currencies
 - **Authentication:** Required (Admin)
 - **Request Parameters:** None
@@ -1012,19 +1012,19 @@
 
 ---
 
-#### 2. Update General Sittings
+#### 2. Update General settings
 
-- **Endpoint:** `POST /sittings/update-general`
+- **Endpoint:** `POST /settings/update-general`
 - **Description:** Update general settings and optionally upload a site logo
 - **Authentication:** Required (Admin)
 - **Content-Type:** multipart/form-data
 - **Request Parts:**
   | Part | Type | Required | Description |
   |------|------|----------|-------------|
-  | updated-sittings | Array<Sitting> | ✓ | List of sitting key/value updates |
+  | updated-settings | Array<setting> | ✓ | List of setting key/value updates |
   | site-logo | File | ✗ | Site logo image file |
 
-- **Sitting Structure:**
+- **setting Structure:**
   ```json
   {
     "key": "SITE_NAME",
@@ -1036,7 +1036,7 @@
 - **Response:**
     - **Status:** 200 OK
     - **Content-Type:** text/plain
-    - **Body:** "General Sittings Updated Successfully"
+    - **Body:** "General settings Updated Successfully"
 
 - **Possible Exceptions:**
     - `FileStorageException` - Site logo storage failed
@@ -1045,7 +1045,7 @@
 
 #### 3. List Countries
 
-- **Endpoint:** `GET /sittings/countries`
+- **Endpoint:** `GET /settings/countries`
 - **Description:** Retrieve all countries
 - **Authentication:** Required (Admin)
 - **Request Parameters:** None
@@ -1067,7 +1067,7 @@
 
 #### 4. Save Country
 
-- **Endpoint:** `POST /sittings/save-country`
+- **Endpoint:** `POST /settings/save-country`
 - **Description:** Create or update a country
 - **Authentication:** Required (Admin)
 - **Content-Type:** application/json
@@ -1089,7 +1089,7 @@
 
 #### 5. Delete Country
 
-- **Endpoint:** `DELETE /sittings/delete-country/{country_id}`
+- **Endpoint:** `DELETE /settings/delete-country/{country_id}`
 - **Description:** Delete country by ID
 - **Authentication:** Required (Admin)
 - **Path Parameters:**
@@ -1109,7 +1109,7 @@
 
 #### 6. List States by Country
 
-- **Endpoint:** `GET /sittings/states/{country_id}`
+- **Endpoint:** `GET /settings/states/{country_id}`
 - **Description:** Retrieve states for a specific country
 - **Authentication:** Required (Admin)
 - **Path Parameters:**
@@ -1135,7 +1135,7 @@
 
 #### 7. Save State
 
-- **Endpoint:** `POST /sittings/save-state`
+- **Endpoint:** `POST /settings/save-state`
 - **Description:** Create or update a state
 - **Authentication:** Required (Admin)
 - **Content-Type:** application/json
@@ -1160,7 +1160,7 @@
 
 #### 8. Delete State
 
-- **Endpoint:** `DELETE /sittings/delete-state/{state_id}`
+- **Endpoint:** `DELETE /settings/delete-state/{state_id}`
 - **Description:** Delete state by ID
 - **Authentication:** Required (Admin)
 - **Path Parameters:**
@@ -1178,16 +1178,16 @@
 
 ---
 
-#### 9. Get Mail Server Sittings
+#### 9. Get Mail Server settings
 
-- **Endpoint:** `GET /sittings/mail-server`
+- **Endpoint:** `GET /settings/mail-server`
 - **Description:** Retrieve mail server settings
 - **Authentication:** Required (Admin)
 - **Request Parameters:** None
 - **Response:**
     - **Status:** 200 OK
     - **Content-Type:** application/json
-    - **Body:** Array<Sitting> where category is `MAIL_SERVER`
+    - **Body:** Array<setting> where category is `MAIL_SERVER`
       ```json
       [
         {
@@ -1342,7 +1342,7 @@
 }
 ```
 
-### Sitting
+### setting
 
 ```json
 {
@@ -1363,7 +1363,7 @@
 }
 ```
 
-### SittingCategory
+### settingCategory
 
 ```json
 [
