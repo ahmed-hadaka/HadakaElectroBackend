@@ -40,7 +40,7 @@ public class GlobalExceptionController {
 
     @ExceptionHandler(DuplicatedObjectException.class)
     public ResponseEntity<Map<String, String>> handleDuplicatedObjectException(DuplicatedObjectException ex) {
-        return ResponseEntity.status(HttpStatus.IM_USED)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("message", ex.getMessage()));
     }
 

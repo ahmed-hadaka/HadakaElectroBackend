@@ -15,7 +15,7 @@ build/
 .mvn/
 !/.mvn/wrapper/maven-wrapper.jar
 
-
+*.md
 default_images/
 uploads/
 brand_logos/

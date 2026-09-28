@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -16,7 +17,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 //..-5-.. or 5-....
     Page<Product> getAllProductsByCategoryAndSubCategory(int catId, String midCatId, String startCatId, Pageable pageable);
 
-    @Query(value = "select * from products where enabled = true and " +
-            "match(name, short_description,full_description) against (?1 IN NATURAL LANGUAGE MODE)", nativeQuery = true)
-    Page<Product> fullTextSearchByKeyword(String keyword, Pageable pageable);
+
+    @Query(value = "select * from products " +
+            "where match(name, full_description, short_description)" +
+            " against(:keyword)"
+            , nativeQuery = true
+    )
+    Page<Product> fullTextSearchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
