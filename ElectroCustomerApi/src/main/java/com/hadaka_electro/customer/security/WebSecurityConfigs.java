@@ -1,13 +1,22 @@
 package com.hadaka_electro.customer.security;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -19,6 +28,15 @@ import java.util.List;
 @EnableWebSecurity
 public class WebSecurityConfigs {
 
+    private CustomerUserDetailsService customerUserDetailsService;
+
+    @Value("${remember.me.key}")
+    private String rememberMeKey;
+
+    public WebSecurityConfigs(CustomerUserDetailsService customerUserDetailsService) {
+        this.customerUserDetailsService = customerUserDetailsService;
+    }
+
     // @formatter:off
 
     @Bean
@@ -26,18 +44,20 @@ public class WebSecurityConfigs {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
         http
-//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 //				 this enables cookie-based CSRF so React can read XSRF-TOKEN cookie
-//                .csrf(csrf -> csrf
-//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//                        .csrfTokenRequestHandler(requestHandler))
-                .cors(cors->cors.disable())
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(requestHandler))
+//                .cors(cors->cors.disable())
+//                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // creates session on login
                 )
                 .authorizeHttpRequests(request ->
-                        request.anyRequest().permitAll());
+                        request.anyRequest().permitAll())
+                .rememberMe(rememberMe ->
+                        rememberMe.rememberMeServices(rememberMeServices()));
 
         return http.build();
     }
@@ -47,7 +67,7 @@ public class WebSecurityConfigs {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:63342")); // frontend Origin
+        config.setAllowedOrigins(List.of("http://localhost:4200")); // frontend Origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -60,5 +80,32 @@ public class WebSecurityConfigs {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+
+    @Bean
+    public RememberMeServices rememberMeServices() {
+        TokenBasedRememberMeServices rememberMeServices =
+                new TokenBasedRememberMeServices(rememberMeKey, customerUserDetailsService) {
+                    @Override
+                    protected boolean rememberMeRequested(HttpServletRequest request, String parameter) {
+                        // Check if our controller set the remember-me flag attribute
+                        Boolean rememberMeAttr = (Boolean) request.getAttribute("REMEMBER_ME_REQUESTED");
+                        return rememberMeAttr != null ? rememberMeAttr : super.rememberMeRequested(request, parameter);
+                    }
+                };
+
+        rememberMeServices.setTokenValiditySeconds(86400 * 7); // 7 day
+        return rememberMeServices;
     }
 }

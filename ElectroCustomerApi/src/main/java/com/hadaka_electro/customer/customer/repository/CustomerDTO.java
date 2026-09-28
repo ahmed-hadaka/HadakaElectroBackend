@@ -1,4 +1,4 @@
-package com.hadaka_electro.internal.customer;
+package com.hadaka_electro.customer.customer.repository;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -50,8 +50,6 @@ public class CustomerDTO {
     @NotBlank(message = "State is required")
     @Size(max = 45, message = "State cannot exceed 45 characters")
     private String state;
-
-    private boolean enabled;
 
     @NotBlank(message = "Postal code is required")
     @Size(max = 10, message = "Postal code cannot exceed 10 characters")

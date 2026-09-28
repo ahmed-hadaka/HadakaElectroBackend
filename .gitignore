@@ -15,6 +15,7 @@ build/
 .mvn/
 !/.mvn/wrapper/maven-wrapper.jar
 
+*.md
 /docs/**
 default_images/
 uploads/

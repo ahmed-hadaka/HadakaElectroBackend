@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -43,22 +44,22 @@ public class WebSecurityConfigs {
 		requestHandler.setCsrfRequestAttributeName("_csrf");
 
 		http
-//			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 //				 this enables cookie-based CSRF so React can read XSRF-TOKEN cookie
-//			.csrf(csrf -> csrf
-//					.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//					.csrfTokenRequestHandler(requestHandler))
-				.cors(cors -> cors.disable())
-				.csrf(csrf -> csrf.disable())
+			.csrf(csrf -> csrf
+					.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+					.csrfTokenRequestHandler(requestHandler))
+//				.cors(cors -> cors.disable())
+//				.csrf(csrf -> csrf.disable())
 			.sessionManagement(session -> session
 					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // creates session on login
 			)
 			.authorizeHttpRequests(request -> request
 			.requestMatchers("/auth/**").permitAll()
-			.requestMatchers("/assets/**").permitAll()
-			.requestMatchers("/webjars/**").permitAll()
+//			.requestMatchers("/assets/**").permitAll()
+//			.requestMatchers("/webjars/**").permitAll()
 			.requestMatchers("/user_photos/**", "/brand_logos", "/categories_images", "/default_images","/product_images").permitAll()
-			.requestMatchers("/users/**","/sittings/**").hasAuthority("Admin")
+			.requestMatchers("/users/**","/settings/**").hasAuthority("Admin")
 			.requestMatchers("/products/edit/**", "/products/save-product").hasAnyAuthority("Admin","Editor","Salesperson")
 			.requestMatchers("/products","/products/", "/products/{id}").hasAnyAuthority("Admin","Editor","Salesperson","Shipper")
 			.requestMatchers("/customers/**","/shipping/**","/reports/**").hasAnyAuthority("Admin","Salesperson")
@@ -92,7 +93,7 @@ public class WebSecurityConfigs {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:63342", "http://localhost:4200")); // frontend Origin
+        config.setAllowedOrigins(List.of("http://localhost:4200")); // frontend Origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

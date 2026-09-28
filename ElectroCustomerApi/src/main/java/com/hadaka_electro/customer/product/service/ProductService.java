@@ -63,6 +63,7 @@ public class ProductService {
         return product.get();
     }
 
+    @Transactional
     public Page<ProductListDTO> searchProducts(String keyword, Pageable pageable) {
         Page<Product> products = productRepository.fullTextSearchByKeyword(keyword, pageable);
         if (products.isEmpty()) {

@@ -1,6 +1,6 @@
 package com.hadaka_electro.common.entities;
 
-import com.hadaka_electro.common.entities.sitting.Country;
+import com.hadaka_electro.common.entities.setting.Country;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -50,6 +50,8 @@ public class Customer extends AbstractAuditableEntity {
 
     @Column(name = "verification_code", length = 64)
     private String verificationCode;
+
+    private String resetPasswordToken;
 
     private boolean enabled;
 
