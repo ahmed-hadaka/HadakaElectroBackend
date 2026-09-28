@@ -302,7 +302,7 @@ Full-text search by keyword.
 
 ## General settings
 
-### GET `/general-sittings`
+### GET `/general-settings`
 
 Returns general/currency settings for the app startup flow.
 
