@@ -45,7 +45,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getProductById(int prodId) throws ObjectNotFoundException {
+    public Map<String, Object> getProductById(Integer prodId) throws ObjectNotFoundException {
         Product product = findProductById(prodId);
         ProductDTO productDTO = productMapper.toProductDTO(product);
 
@@ -56,7 +56,7 @@ public class ProductService {
         return Map.of("parentCategories", parentCategoriesList, "productDTO", productDTO);
     }
 
-    private Product findProductById(int id) throws ObjectNotFoundException {
+    private Product findProductById(Integer id) throws ObjectNotFoundException {
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty())
             throw new ObjectNotFoundException("No Products with this id: " + id);
