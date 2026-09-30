@@ -36,7 +36,7 @@ public class ProductController {
     }
 
     @GetMapping("/p/{product-id}")
-    public ResponseEntity<Map<String, Object>> getProduct(@PathVariable("product-id") int prodId) throws ObjectNotFoundException {
+    public ResponseEntity<Map<String, Object>> getProduct(@PathVariable("product-id") Integer prodId) throws ObjectNotFoundException {
         Map<String, Object> res = productService.getProductById(prodId);
         return ResponseEntity.ok(res);
     }

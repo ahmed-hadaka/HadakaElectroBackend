@@ -45,7 +45,7 @@ public class WebSecurityConfigs {
         requestHandler.setCsrfRequestAttributeName("_csrf");
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-//				 this enables cookie-based CSRF so React can read XSRF-TOKEN cookie
+////				 this enables cookie-based CSRF so React can read XSRF-TOKEN cookie
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(requestHandler))

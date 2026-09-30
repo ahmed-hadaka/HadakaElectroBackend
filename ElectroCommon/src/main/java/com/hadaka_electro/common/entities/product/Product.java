@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+
 @Getter
 @Setter
 @ToString
@@ -25,7 +26,7 @@ public class Product extends AbstractAuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Product name cannot be blank")
@@ -107,4 +108,8 @@ public class Product extends AbstractAuditableEntity {
         return price -= (price * (discountPercent / 100));
     }
 
+
+    public Integer getId() {
+        return this.id;
+    }
 }
