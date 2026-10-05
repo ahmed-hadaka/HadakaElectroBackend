@@ -34,6 +34,8 @@ public class ShoppingCartService {
         if (cartItems.isEmpty())
             return List.of();
         return cartItems.stream().map(item -> {
+            if (item.getProduct() == null)
+                return null;
             return new CartItemDTO(
                     item.getProduct().getId(),
                     item.getProduct().getName(),
