@@ -109,7 +109,4 @@ public class Product extends AbstractAuditableEntity {
     }
 
 
-    public Integer getId() {
-        return this.id;
-    }
 }

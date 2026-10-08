@@ -53,4 +53,8 @@ public class Address {
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
+
+    public String getFullName() {
+        return this.firstName + " " + lastName;
+    }
 }

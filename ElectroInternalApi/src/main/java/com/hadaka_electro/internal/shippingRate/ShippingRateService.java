@@ -35,9 +35,9 @@ public class ShippingRateService {
     @Transactional
     public int saveShippingRate(ShippingRate shippingRate) throws DuplicatedObjectException, ObjectNotFoundException {
         // Check if destination already exists to prevent duplicates
-        Optional<ShippingRate> existingDest = shippingRateRepository.findByCountryAndState(shippingRate.getCountry(), shippingRate.getState());
+        ShippingRate existingDest = getShippingRateByCountryAndState(shippingRate.getCountry(), shippingRate.getState());
 
-        if (existingDest.isPresent() && (shippingRate.getId() == null || !existingDest.get().getId().equals(shippingRate.getId()))) {
+        if (existingDest != null && (shippingRate.getId() == null || !existingDest.getId().equals(shippingRate.getId()))) {
             throw new DuplicatedObjectException("There is already a rate for the destination " + shippingRate.getState() + ", " + shippingRate.getCountry());
         }
 
@@ -48,9 +48,8 @@ public class ShippingRateService {
     }
 
     public ShippingRate findById(int id) throws ObjectNotFoundException {
-        ShippingRate rate = shippingRateRepository.findById(id)
+        return shippingRateRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("No shipping rate found with ID: " + id));
-        return rate;
     }
 
     @Transactional
@@ -73,5 +72,10 @@ public class ShippingRateService {
             throw new ObjectNotFoundException("Shipping rate not found with id: " + id);
         }
         return !currentStatus;
+    }
+
+    public ShippingRate getShippingRateByCountryAndState(String country, String state) {
+        Optional<ShippingRate> existingDest = shippingRateRepository.findByCountryAndState(country, state);
+        return existingDest.orElse(null);
     }
 }
