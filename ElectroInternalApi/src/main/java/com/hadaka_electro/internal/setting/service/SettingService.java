@@ -85,18 +85,7 @@ public class SettingService {
     @Transactional
     public void updateGeneralSettings(List<Setting> generalSettings, MultipartFile siteLogoFile) {
 
-        List<String> updatedSettingsKeys = generalSettings.stream().map(setting -> setting.getKey()).toList();
-
-        List<Setting> existedSettingOfKeys = settingRepository.findAllById(updatedSettingsKeys);
-
-        Map<String, String> updatedSettingsMap = generalSettings.stream()
-                .collect(Collectors.toMap(setting -> setting.getKey(), setting -> setting.getValue()));
-
-        // dirty checking will occur here and updates will be saved to db.
-        existedSettingOfKeys.forEach(existedSetting -> {
-            existedSetting.setValue(updatedSettingsMap.get(existedSetting.getKey()));
-        });
-
+        updateSettings(generalSettings);
 
         if (siteLogoFile != null && !siteLogoFile.isEmpty()) {
             String uploadDir = "default_images/siteLogos";
@@ -136,4 +125,27 @@ public class SettingService {
         return settingRepository.findByCategory(SettingCategory.MAIL_TEMPLATES);
     }
 
+    @Transactional
+    public void updatePaymentSettings(List<Setting> paymentSettings) {
+        updateSettings(paymentSettings);
+    }
+
+    private void updateSettings(List<Setting> settingList) {
+        List<String> updatedSettingsKeys = settingList.stream().map(setting -> setting.getKey()).toList();
+
+        List<Setting> existedSettingOfKeys = settingRepository.findAllById(updatedSettingsKeys);
+
+        Map<String, String> updatedSettingsMap = settingList.stream()
+                .collect(Collectors.toMap(setting -> setting.getKey(), setting -> setting.getValue()));
+
+        // dirty checking will occur here and updates will be saved to db.
+        existedSettingOfKeys.forEach(existedSetting -> {
+            existedSetting.setValue(updatedSettingsMap.get(existedSetting.getKey()));
+        });
+    }
+
+    @Transactional(readOnly = true)
+    public List<Setting> getPaymentSettings() {
+        return settingRepository.findByCategory(SettingCategory.PAYMENT);
+    }
 }

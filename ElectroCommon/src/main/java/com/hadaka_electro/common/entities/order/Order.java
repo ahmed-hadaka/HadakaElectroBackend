@@ -91,13 +91,4 @@ public class Order extends AbstractAuditableEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderDetail> orderDetails = new HashSet<>();
 
-    @PrePersist
-    protected void onCreate() {
-        if (orderTime == null) {
-            orderTime = LocalDateTime.now();
-        }
-        if (status == null) {
-            status = OrderStatus.NEW;
-        }
-    }
 }

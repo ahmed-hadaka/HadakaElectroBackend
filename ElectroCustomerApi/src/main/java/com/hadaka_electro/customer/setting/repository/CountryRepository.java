@@ -6,9 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CountryRepository extends JpaRepository<Country, Long> {
     @Query("select c from Country c left join fetch c.states order by c.name asc")
     List<Country> findAllByNameAsc();
+
+    Optional<Country> findCountryByName(Country country);
+
+    Optional<Country> findCountryById(Long countryId);
 }

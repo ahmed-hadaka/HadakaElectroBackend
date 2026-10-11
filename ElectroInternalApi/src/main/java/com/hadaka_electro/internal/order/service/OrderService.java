@@ -44,22 +44,6 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("No order found with ID: " + id));
 
-//        Set<OrderDetail> orderDetails = order.getOrderDetails();
-//        double shippingCost = 0.0, productCost = 0.0, subTotal = 0.0,
-//                total = 0.0, DIM_weight = 0.0, billableWeight = 0.0, DIM_FACTOR = 5000.0;
-//
-//        Address defaultAddress = addressBookService.getDefaultAddress(order.getCustomer().getEmail());
-//        ShippingRate distenationShippingRate = shippingRateService.getShippingRateByCountryAndState(defaultAddress.getCountry().getName(),defaultAddress.getState());
-//
-//        for (OrderDetail orderDetail : orderDetails) {
-//            Product product = orderDetail.getProduct();
-//            DIM_weight = (product.getLength() * product.getWidth() * product.getHeight()) / DIM_FACTOR;
-//            billableWeight = Math.max(product.getWeight(), DIM_weight);
-//            billableWeight = billableWeight * orderDetail.getQuantity();
-//
-//            shippingCost += billableWeight* distenationShippingRate.getRate();
-//        }
-
         return orderMapper.toDTO(order);
     }
 

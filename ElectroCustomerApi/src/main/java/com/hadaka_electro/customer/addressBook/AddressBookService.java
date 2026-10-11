@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,5 +82,10 @@ public class AddressBookService {
     private Customer getCustomer(String email) {
         return customerRepository.findCustomerByEmail(email)
                 .orElseThrow(() -> new ObjectNotFoundException("Customer not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Address> getDefaultAddressByCustomer(Customer customer) {
+        return addressRepository.findAddressByDefaultForShippingAndCustomer(true, customer);
     }
 }

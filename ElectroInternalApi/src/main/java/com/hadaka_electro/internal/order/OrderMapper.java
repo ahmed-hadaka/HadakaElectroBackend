@@ -1,10 +1,8 @@
 package com.hadaka_electro.internal.order;
 
-import com.hadaka_electro.common.entities.Address;
 import com.hadaka_electro.common.entities.Customer;
 import com.hadaka_electro.common.entities.order.Order;
 import com.hadaka_electro.common.entities.order.OrderDetail;
-import com.hadaka_electro.internal.addressBook.AddressBookService;
 import com.hadaka_electro.internal.order.dto.OrderDTO;
 import com.hadaka_electro.internal.order.dto.OrderDetailDTO;
 import com.hadaka_electro.internal.order.dto.OrderListDTO;
@@ -61,6 +59,8 @@ public class OrderMapper {
 
         dto.setPaymentMethod(order.getPaymentMethod());
         dto.setStatus(order.getStatus());
+        dto.setDeliverDays(order.getDeliverDays());
+        dto.setExpectedDeliverDate(order.getDeliverDate());
         dto.setShippingCost(order.getShippingCost());// sum of all product's Shipping cost
         dto.setProductCost(order.getProductCost());// sum of all product's cost
         dto.setSubtotal(order.getSubtotal());// sum of (unit price * quantity)

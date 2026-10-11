@@ -85,4 +85,16 @@ public class SettingController {
         List<Setting> mailTemplatesSettings = settingService.getMailTemplatesSettings();
         return ResponseEntity.ok(mailTemplatesSettings);
     }
+
+    @PostMapping("/update-payment")
+    public ResponseEntity<String> updatePaymentSettings(@RequestBody List<Setting> paymentSettings) {
+        settingService.updatePaymentSettings(paymentSettings);
+        return ResponseEntity.ok("Payment Settings Updated Successfully");
+    }
+
+    @GetMapping("/payment-settings")
+    public ResponseEntity<List<Setting>> getPaymentSettings() {
+        List<Setting> paymentSettings = settingService.getPaymentSettings();
+        return ResponseEntity.ok(paymentSettings);
+    }
 }

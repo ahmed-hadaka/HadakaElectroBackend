@@ -19,7 +19,6 @@ public class AddressDTO {
     private String state;
     private String postalCode;
     private boolean defaultForShipping;
-
     private Long countryId;
     private String countryName;
 }

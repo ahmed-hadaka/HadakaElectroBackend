@@ -124,11 +124,7 @@ public class CustomerService {
 
     @Transactional
     public Map<String, String> setPasswordToken(String customerEmail) {
-        Optional<Customer> customerOptional = customerRepository.findCustomerByEmail(customerEmail);
-        if (customerOptional.isEmpty())
-            throw new ObjectNotFoundException("No Customers with this email: " + customerEmail);
-
-        Customer customer = customerOptional.get();
+        Customer customer = getCustomerByEmail(customerEmail);
 
         String token = RandomString.make(30);
         customer.setResetPasswordToken(token);
@@ -182,11 +178,13 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public CustomerDTO getCustomerDetails(String customerEmail) {
-        Optional<Customer> customerOptional = customerRepository.findCustomerByEmail(customerEmail);
-        if (customerOptional.isEmpty())
-            throw new ObjectNotFoundException("No Customers with this email: " + customerEmail);
-
-        Customer customer = customerOptional.get();
+        Customer customer = getCustomerByEmail(customerEmail);
         return customerMapper.toDTO(customer);
+    }
+
+    @Transactional(readOnly = true)
+    public Customer getCustomerByEmail(String email) {
+        return customerRepository.findCustomerByEmail(email)
+                .orElseThrow(() -> new ObjectNotFoundException("Customer not found for email: " + email));
     }
 }

@@ -56,7 +56,7 @@ public class ProductService {
         return Map.of("parentCategories", parentCategoriesList, "productDTO", productDTO);
     }
 
-    private Product findProductById(Integer id) throws ObjectNotFoundException {
+    public Product findProductById(Integer id) throws ObjectNotFoundException {
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty())
             throw new ObjectNotFoundException("No Products with this id: " + id);

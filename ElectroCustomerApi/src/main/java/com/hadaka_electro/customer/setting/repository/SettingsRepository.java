@@ -11,4 +11,6 @@ import java.util.List;
 public interface SettingsRepository extends JpaRepository<Setting, String> {
 
     List<Setting> findByCategoryOrCategory(SettingCategory settingCategory, SettingCategory settingCategory1);
+
+    List<Setting> findByCategory(SettingCategory settingCategory);
 }

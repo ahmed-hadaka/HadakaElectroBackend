@@ -1,11 +1,15 @@
 package com.hadaka_electro.customer.shopping_cart;
 
+import com.hadaka_electro.common.entities.Address;
 import com.hadaka_electro.common.entities.CartItem;
 import com.hadaka_electro.common.entities.Customer;
+import com.hadaka_electro.common.entities.ShippingRate;
 import com.hadaka_electro.common.entities.product.Product;
 import com.hadaka_electro.common.exception.ObjectNotFoundException;
-import com.hadaka_electro.customer.customer.repository.CustomerRepository;
+import com.hadaka_electro.customer.addressBook.AddressBookService;
+import com.hadaka_electro.customer.customer.CustomerService;
 import com.hadaka_electro.customer.product.repository.ProductRepository;
+import com.hadaka_electro.customer.shippingRate.ShippingRateService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,17 +23,22 @@ public class ShoppingCartService {
 
     private final CartItemRepository cartRepo;
     private final ProductRepository productRepo;
-    private final CustomerRepository customerRepo;
+    private final AddressBookService addressBookService;
+    private final ShippingRateService shippingRateService;
+    private final CustomerService customerService;
+//    private ShippingRateService shippingRateService;
 
-    public ShoppingCartService(CartItemRepository cartRepo, ProductRepository productRepo, CustomerRepository customerRepo) {
+    public ShoppingCartService(CartItemRepository cartRepo, ProductRepository productRepo, AddressBookService addressBookService, ShippingRateService shippingRateService, CustomerService customerService) {
         this.cartRepo = cartRepo;
         this.productRepo = productRepo;
-        this.customerRepo = customerRepo;
+        this.addressBookService = addressBookService;
+        this.shippingRateService = shippingRateService;
+        this.customerService = customerService;
     }
 
     @Transactional(readOnly = true)
     public List<CartItemDTO> listCartItems(String customerEmail) {
-        Customer customer = getCustomerByEmail(customerEmail);
+        Customer customer = customerService.getCustomerByEmail(customerEmail);
         List<CartItem> cartItems = cartRepo.findByCustomer(customer);
         if (cartItems.isEmpty())
             return List.of();
@@ -41,6 +50,7 @@ public class ShoppingCartService {
                     item.getProduct().getName(),
                     item.getProduct().getMainImage(),
                     item.getProduct().getPriceAfterDiscount(),
+                    item.getProduct().getCost(),
                     item.getQuantity()
             );
 
@@ -54,7 +64,7 @@ public class ShoppingCartService {
             throw new IllegalArgumentException("Quantity must be between 1 and 5.");
         }
 
-        Customer customer = getCustomerByEmail(customerEmail);
+        Customer customer = customerService.getCustomerByEmail(customerEmail);
         Product product = getProductById(productId);
 
         Optional<CartItem> existingItem = cartRepo.findByCustomerAndProduct(customer, product);
@@ -82,7 +92,7 @@ public class ShoppingCartService {
             throw new IllegalArgumentException("Quantity must be between 1 and 5.");
         }
 
-        Customer customer = getCustomerByEmail(customerEmail);
+        Customer customer = customerService.getCustomerByEmail(customerEmail);
         // if no cart items with these id's, nothing happen!
         cartRepo.updateQuantity(quantity, customer.getId(), productId);
 
@@ -90,17 +100,29 @@ public class ShoppingCartService {
 
     @Transactional
     public void removeProduct(Integer productId, String customerEmail) {
-        Customer customer = getCustomerByEmail(customerEmail);
+        Customer customer = customerService.getCustomerByEmail(customerEmail);
         cartRepo.deleteByCustomerAndProduct(customer.getId(), productId);
     }
 
-    private Customer getCustomerByEmail(String email) {
-        return customerRepo.findCustomerByEmail(email)
-                .orElseThrow(() -> new ObjectNotFoundException("Customer not found for email: " + email));
-    }
 
     private Product getProductById(Integer productId) {
         return productRepo.findById(productId)
                 .orElseThrow(() -> new ObjectNotFoundException("Product not found with ID: " + productId));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean checkShippingAvailability(String email) {
+        Customer customer = customerService.getCustomerByEmail(email);
+        Optional<Address> defaultAddress = addressBookService.getDefaultAddressByCustomer(customer);
+        if (defaultAddress.isEmpty())
+            return false;
+        ShippingRate shippingRate = shippingRateService.getShippingRateByCountryAndState(defaultAddress.get().getCountry().getName(), defaultAddress.get().getState());
+        return shippingRate != null;
+    }
+
+    @Transactional
+    public void removeAllByCustomer(String customerEmail) {
+        Customer customer = customerService.getCustomerByEmail(customerEmail);
+        cartRepo.deleteCartItemsByCustomer(customer);
     }
 }

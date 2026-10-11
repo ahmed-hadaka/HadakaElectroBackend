@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class OrderDTO {
 
 
     private Integer deliverDays;
-    private LocalDateTime expectedDeliverDate;
+    private LocalDate expectedDeliverDate;
     private double shippingCost;
     private double productCost;
     private double subtotal;
