@@ -54,4 +54,14 @@ public class OrderService {
         }
         orderRepository.deleteById(id);
     }
+
+
+    @Transactional
+    public void updateOrderDetails(OrderDTO orderDTO) {
+        if (!orderRepository.existsById(orderDTO.id())) {
+            throw new ObjectNotFoundException("No order found with ID: " + orderDTO.id());
+        }
+        Order updatedOrder = orderMapper.toEntity(orderDTO);
+        orderRepository.save(updatedOrder);
+    }
 }

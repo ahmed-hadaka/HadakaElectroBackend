@@ -10,12 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/orders")
@@ -38,6 +33,12 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> viewOrderDetails(@PathVariable int id) throws ObjectNotFoundException {
         return ResponseEntity.ok(orderService.findById(id));
+    }
+
+    @PostMapping("/update-order")
+    public ResponseEntity<String> updateOrderDetails(@RequestBody OrderDTO orderDTO) {
+        orderService.updateOrderDetails(orderDTO);
+        return ResponseEntity.ok("Order id: " + orderDTO.id() + " updated successfully");
     }
 
     @DeleteMapping("/delete/{id}")

@@ -52,6 +52,12 @@ public class ShippingRateController {
         return ResponseEntity.ok(shippingRate);
     }
 
+    @GetMapping("/get-by-country-and-state")
+    public ResponseEntity<ShippingRate> getShippingRateByCountryAndState(@RequestParam String country, @RequestParam String state) throws ObjectNotFoundException {
+        ShippingRate shippingRate = shippingRateService.getShippingRateByCountryAndState(country, state);
+        return ResponseEntity.ok(shippingRate);
+    }
+
     @PatchMapping("/update-cod-status/{id}")
     public ResponseEntity<String> updateCODStatus(@PathVariable int id) throws ObjectNotFoundException {
         boolean status = shippingRateService.updateCODSupport(id);

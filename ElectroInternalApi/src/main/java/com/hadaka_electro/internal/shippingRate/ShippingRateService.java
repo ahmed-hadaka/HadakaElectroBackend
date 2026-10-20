@@ -37,7 +37,7 @@ public class ShippingRateService {
         // Check if destination already exists to prevent duplicates
         ShippingRate existingDest = getShippingRateByCountryAndState(shippingRate.getCountry(), shippingRate.getState());
 
-        if (existingDest != null && (shippingRate.getId() == null || !existingDest.getId().equals(shippingRate.getId()))) {
+        if (shippingRate.getId() == null || !existingDest.getId().equals(shippingRate.getId())) {
             throw new DuplicatedObjectException("There is already a rate for the destination " + shippingRate.getState() + ", " + shippingRate.getCountry());
         }
 
@@ -75,7 +75,7 @@ public class ShippingRateService {
     }
 
     public ShippingRate getShippingRateByCountryAndState(String country, String state) {
-        Optional<ShippingRate> existingDest = shippingRateRepository.findByCountryAndState(country, state);
-        return existingDest.orElse(null);
+        return shippingRateRepository.findByCountryAndState(country, state)
+                .orElseThrow(() -> new ObjectNotFoundException("Shipping rate not found with country' " + country + " ' and state' " + state + " '"));
     }
 }

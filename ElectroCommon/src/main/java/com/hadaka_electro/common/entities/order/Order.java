@@ -1,7 +1,6 @@
 package com.hadaka_electro.common.entities.order;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.hadaka_electro.common.entities.AbstractAuditableEntity;
 import com.hadaka_electro.common.entities.Customer;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,7 +19,7 @@ import java.util.Set;
 @ToString(exclude = {"customer", "orderDetails"})
 @EqualsAndHashCode(exclude = {"customer", "orderDetails"})
 @EntityListeners(AuditingEntityListener.class)
-public class Order extends AbstractAuditableEntity {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -91,4 +90,10 @@ public class Order extends AbstractAuditableEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderDetail> orderDetails = new HashSet<>();
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<OrderTrack> orderTracks = new HashSet<>();
+
+    public void addOrderTrack(OrderTrack orderTrack) {
+        this.orderTracks.add(orderTrack);
+    }
 }

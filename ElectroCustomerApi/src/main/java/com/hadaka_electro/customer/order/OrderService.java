@@ -1,10 +1,7 @@
 package com.hadaka_electro.customer.order;
 
 import com.hadaka_electro.common.entities.Customer;
-import com.hadaka_electro.common.entities.order.Order;
-import com.hadaka_electro.common.entities.order.OrderDetail;
-import com.hadaka_electro.common.entities.order.OrderStatus;
-import com.hadaka_electro.common.entities.order.PaymentMethod;
+import com.hadaka_electro.common.entities.order.*;
 import com.hadaka_electro.common.entities.product.Product;
 import com.hadaka_electro.common.entities.setting.Country;
 import com.hadaka_electro.common.entities.setting.Setting;
@@ -65,6 +62,7 @@ public class OrderService {
         AddressDTO defaultShippingAddress = (AddressDTO) orderInfo.get("defaultShippingAddress");
         OrderSummaryInfoDTO orderSummaryInfoDTO = (OrderSummaryInfoDTO) orderInfo.get("orderSummaryInfo");
 
+        // fill basic order info
         Order order = new Order();
 
         order.setOrderTime(LocalDateTime.now());
@@ -77,7 +75,6 @@ public class OrderService {
         order.setPostalCode(defaultShippingAddress.getPostalCode());
         Country country = countryRepository.findCountryById(defaultShippingAddress.getCountryId())
                 .orElseThrow(() -> new ObjectNotFoundException("No Countries found for shipping address"));
-
         order.setCountry(country.getName());
         order.setPaymentMethod(paymentMethod);
         order.setStatus(OrderStatus.NEW);
@@ -90,6 +87,7 @@ public class OrderService {
         order.setDeliverDate(orderSummaryInfoDTO.expectedDeliverDate());
         order.setCustomer(customer);
 
+        // fill order details
         Set<OrderDetail> orderDetails = new HashSet<>();
 
         for (CheckoutCartItemDTO cartItemDTO : orderSummaryInfoDTO.checkoutCartItemDTOS()) {
@@ -107,8 +105,17 @@ public class OrderService {
 
             orderDetails.add(orderDetail);
         }
-
         order.setOrderDetails(orderDetails);
+
+        // fill order track
+        OrderTrack orderTrack = new OrderTrack();
+
+        orderTrack.setOrder(order);
+        orderTrack.setStatus(OrderStatus.NEW);
+        orderTrack.setNotes("Order was placed by customer");
+        order.addOrderTrack(orderTrack);
+
+
         return orderRepository.save(order);
     }
 
