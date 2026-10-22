@@ -41,8 +41,8 @@ public class UserController {
 
 
     @GetMapping("/me")
-    public ResponseEntity<Integer> getCurrentUser(@AuthenticationPrincipal ElectroUserDetails userDetails) {
-        return ResponseEntity.ok(userService.findByEmail(userDetails.getUsername()).getId());
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal ElectroUserDetails userDetails) {
+        return ResponseEntity.ok(userService.findByEmail(userDetails.getUsername()));
     }
 
 

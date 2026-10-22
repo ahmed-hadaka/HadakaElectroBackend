@@ -7,7 +7,6 @@ import com.hadaka_electro.common.entities.order.OrderTrack;
 import com.hadaka_electro.common.entities.product.Product;
 import com.hadaka_electro.common.exception.ObjectNotFoundException;
 import com.hadaka_electro.internal.customer.CustomerRepository;
-import com.hadaka_electro.internal.customer.CustomerService;
 import com.hadaka_electro.internal.order.dto.OrderDTO;
 import com.hadaka_electro.internal.order.dto.OrderDetailDTO;
 import com.hadaka_electro.internal.order.dto.OrderListDTO;
@@ -21,12 +20,10 @@ import java.util.stream.Collectors;
 @Component
 public class OrderMapper {
 
-    private final CustomerService customerService;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
 
-    public OrderMapper(CustomerService customerService, CustomerRepository customerRepository, ProductRepository productRepository) {
-        this.customerService = customerService;
+    public OrderMapper(CustomerRepository customerRepository, ProductRepository productRepository) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
     }
@@ -38,7 +35,7 @@ public class OrderMapper {
 
         return new OrderListDTO(
                 order.getId(),
-                resolveCustomerName(order.getCustomer()),
+                order.getRecipientName(),
                 order.getTotal(),
                 order.getOrderTime(),
                 formatDestination(order),
@@ -52,11 +49,12 @@ public class OrderMapper {
             return null;
         }
 
+        assert order.getCustomer() != null;
         return new OrderDTO(
                 order.getId(),
                 order.getOrderTime(),
-                order.getCustomer() != null ? order.getCustomer().getId() : null,
-                resolveCustomerName(order.getCustomer()),
+                order.getCustomer().getId(),
+                order.getCustomer().getFullName(),
                 order.getCustomer() != null ? order.getCustomer().getEmail() : null,
                 order.getCustomer() != null ? order.getCustomer().getPhoneNumber() : null,
                 order.getRecipientName(),
@@ -141,7 +139,6 @@ public class OrderMapper {
         return order;
     }
 
-    //  OrderDetail Conversions 
 
     private Set<OrderDetailDTO> toDetailDTOs(Set<OrderDetail> orderDetails) {
         if (orderDetails == null || orderDetails.isEmpty()) {
@@ -255,16 +252,12 @@ public class OrderMapper {
     //  Helpers
     private String formatDestination(Order order) {
         return String.join(", ",
-                List.of(Optional.ofNullable(order.getCountry()).orElse(""),
+                List.of(Optional.ofNullable(order.getAddressLine1()).orElse(""),
+                        Optional.ofNullable(order.getAddressLine2()).orElse(""),
+                        Optional.ofNullable(order.getCity()).orElse(""),
                         Optional.ofNullable(order.getState()).orElse(""),
-                        Optional.ofNullable(order.getCity()).orElse(""))
+                        Optional.ofNullable(order.getCountry()).orElse(""),
+                        Optional.ofNullable(order.getPostalCode()).orElse(""))
         );
-    }
-
-    private String resolveCustomerName(Customer customer) {
-        if (customer == null) {
-            return null;
-        }
-        return customer.getFirstName() + " " + customer.getLastName();
     }
 }

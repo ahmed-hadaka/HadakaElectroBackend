@@ -1,6 +1,8 @@
 package com.hadaka_electro.internal.order.service;
 
 import com.hadaka_electro.common.entities.order.Order;
+import com.hadaka_electro.common.entities.order.OrderStatus;
+import com.hadaka_electro.common.entities.order.OrderTrack;
 import com.hadaka_electro.common.exception.ObjectNotFoundException;
 import com.hadaka_electro.internal.addressBook.AddressBookService;
 import com.hadaka_electro.internal.order.OrderMapper;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -63,5 +67,22 @@ public class OrderService {
         }
         Order updatedOrder = orderMapper.toEntity(orderDTO);
         orderRepository.save(updatedOrder);
+    }
+
+    @Transactional
+    public void updateOrderStatus(Integer orderId, OrderStatus status, String note) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() ->
+                new ObjectNotFoundException("No order found with ID: " + orderId));
+
+        OrderTrack orderTrack = new OrderTrack();
+        orderTrack.setOrder(order);
+        orderTrack.setUpdatedAt(LocalDateTime.now());
+        orderTrack.setStatus(status);
+        orderTrack.setNotes(note);
+
+        order.addOrderTrack(orderTrack);
+        order.setStatus(status);
+
+        orderRepository.save(order);
     }
 }

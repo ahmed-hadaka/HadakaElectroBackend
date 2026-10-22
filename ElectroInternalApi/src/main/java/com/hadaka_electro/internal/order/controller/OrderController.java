@@ -1,5 +1,6 @@
 package com.hadaka_electro.internal.order.controller;
 
+import com.hadaka_electro.common.entities.order.OrderStatus;
 import com.hadaka_electro.common.exception.ObjectNotFoundException;
 import com.hadaka_electro.internal.order.dto.OrderDTO;
 import com.hadaka_electro.internal.order.dto.OrderListDTO;
@@ -39,6 +40,12 @@ public class OrderController {
     public ResponseEntity<String> updateOrderDetails(@RequestBody OrderDTO orderDTO) {
         orderService.updateOrderDetails(orderDTO);
         return ResponseEntity.ok("Order id: " + orderDTO.id() + " updated successfully");
+    }
+
+    @PatchMapping("/update-order-status")
+    public ResponseEntity<Void> updateOrderStatus(@RequestParam Integer orderId, @RequestParam String note, @RequestParam OrderStatus status) {
+        orderService.updateOrderStatus(orderId, status, note);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/delete/{id}")
