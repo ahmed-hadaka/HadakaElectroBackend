@@ -2,6 +2,8 @@ package com.hadaka_electro.internal.order.dto;
 
 import com.hadaka_electro.common.entities.order.OrderStatus;
 import com.hadaka_electro.common.entities.order.PaymentMethod;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
@@ -62,6 +64,7 @@ public record OrderDTO(
         PaymentMethod paymentMethod,
 
         @NotNull(message = "Order status is required")
+        @Enumerated(EnumType.STRING)
         OrderStatus status,
 
         @NotNull(message = "Deliver days is required")

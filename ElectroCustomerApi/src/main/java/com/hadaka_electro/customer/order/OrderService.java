@@ -113,6 +113,7 @@ public class OrderService {
         orderTrack.setOrder(order);
         orderTrack.setStatus(OrderStatus.NEW);
         orderTrack.setNotes("Order was placed by customer");
+        orderTrack.setUpdatedAt(LocalDateTime.now());
         order.addOrderTrack(orderTrack);
 
 
