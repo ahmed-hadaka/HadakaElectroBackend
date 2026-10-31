@@ -12,6 +12,10 @@ import com.hadaka_electro.customer.checkout.CheckoutCartItemDTO;
 import com.hadaka_electro.customer.checkout.CheckoutService;
 import com.hadaka_electro.customer.checkout.OrderSummaryInfoDTO;
 import com.hadaka_electro.customer.customer.CustomerService;
+import com.hadaka_electro.customer.customer.repository.CustomerRepository;
+import com.hadaka_electro.customer.order.dto.OrderDTO;
+import com.hadaka_electro.customer.order.dto.OrderListDTO;
+import com.hadaka_electro.customer.order.dto.OrderReturnReqDTO;
 import com.hadaka_electro.customer.product.repository.ProductRepository;
 import com.hadaka_electro.customer.setting.SettingService;
 import com.hadaka_electro.customer.setting.repository.CountryRepository;
@@ -19,6 +23,8 @@ import com.hadaka_electro.customer.setting.repository.SettingsRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -36,6 +42,8 @@ public class OrderService {
 
     private final CountryRepository countryRepository;
     private final SettingService settingService;
+    private final CustomerRepository customerRepository;
+    private final OrderMapper orderMapper;
     @Value("${app.frontend.baseUrl}")
     private String frontendBaseUrl;
 
@@ -45,7 +53,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final SettingsRepository settingsRepository;
 
-    public OrderService(CustomerService customerService, CheckoutService checkoutService, OrderRepository orderRepository, ProductRepository productRepository, SettingsRepository settingsRepository, CountryRepository countryRepository, SettingService settingService) {
+    public OrderService(CustomerService customerService, CheckoutService checkoutService, OrderRepository orderRepository, ProductRepository productRepository, SettingsRepository settingsRepository, CountryRepository countryRepository, SettingService settingService, CustomerRepository customerRepository, OrderMapper orderMapper) {
         this.customerService = customerService;
         this.checkoutService = checkoutService;
         this.orderRepository = orderRepository;
@@ -53,6 +61,8 @@ public class OrderService {
         this.settingsRepository = settingsRepository;
         this.countryRepository = countryRepository;
         this.settingService = settingService;
+        this.customerRepository = customerRepository;
+        this.orderMapper = orderMapper;
     }
 
     @Transactional
@@ -120,7 +130,6 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-
     @Async
     public void sendOrderConfirmationEmail(Customer customer, Map<String, String> mailSettings, List<Setting> currencySettings, Order order) throws MessagingException {
 
@@ -154,11 +163,57 @@ public class OrderService {
         }
 
         content = content.replace("[[paymentMethod]]", order.getPaymentMethod().toString());
-        String orderLink = frontendBaseUrl + "/track-order";
+        String orderLink = frontendBaseUrl + "/orders";
         content = content.replace("[[orderLink]]", orderLink);
 
         mimeMessageHelper.setText(content);
 
         mailSender.send(mimeMessage);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderListDTO> getAllCustomerOrders(String email, Pageable pageable, String keyword) {
+        Customer customer = customerService.getCustomerByEmail(email);
+
+        Page<Order> ordersPage;
+        if (keyword != null && !keyword.isEmpty()) {
+            ordersPage = orderRepository.findOrdersByCustomer(customer.getId(), keyword, pageable);
+        } else {
+            ordersPage = orderRepository.findOrdersByCustomer(customer, pageable);
+        }
+        return ordersPage.map(order -> orderMapper.toListDTO(order));
+    }
+
+    @Transactional(readOnly = true)
+    public OrderDTO getOrderByIdAndCustomer(int id, String email) {
+        Customer customer = customerService.getCustomerByEmail(email);
+        Order order = orderRepository.findOrderByIdAndCustomer(id, customer)
+                .orElseThrow(() -> new ObjectNotFoundException("No Orders with this id: " + id + " for you!"));
+
+        return orderMapper.toDTO(order);
+    }
+
+    @Transactional
+    public void requestOrderReturn(OrderReturnReqDTO orderReturnReq, String email) {
+        Customer customer = customerService.getCustomerByEmail(email);
+        Order order = orderRepository.findOrderByIdAndCustomer(orderReturnReq.orderId(), customer)
+                .orElseThrow(() -> new ObjectNotFoundException("No such order with this id: " + orderReturnReq.orderId()));
+
+        if (order.hasStatus(OrderStatus.RETURNED) || order.hasStatus(OrderStatus.RETURNED_REQUESTED))
+            return;
+
+        OrderTrack orderTrack = new OrderTrack();
+        orderTrack.setOrder(order);
+        orderTrack.setStatus(OrderStatus.RETURNED_REQUESTED);
+        orderTrack.setUpdatedAt(LocalDateTime.now());
+        String note = orderReturnReq.reason();
+        if (orderReturnReq.note() != null && !orderReturnReq.note().isEmpty()) {
+            note = note + ", " + orderReturnReq.note();
+        }
+        orderTrack.setNotes(note);
+        order.addOrderTrack(orderTrack);
+        order.setStatus(OrderStatus.RETURNED_REQUESTED);
+
+        orderRepository.save(order);
     }
 }

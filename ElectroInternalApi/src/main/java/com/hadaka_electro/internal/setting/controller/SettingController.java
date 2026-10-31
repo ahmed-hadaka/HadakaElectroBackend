@@ -57,7 +57,6 @@ public class SettingController {
 
     @GetMapping("/states/{country_id}")
     public ResponseEntity<List<StateDTO>> getStatesOfCountry(@PathVariable("country_id") Long countryId) {
-        System.out.println("hello in state api");
         List<StateDTO> countryStates = settingService.getCountryStates(countryId);
         return ResponseEntity.ok(countryStates);
     }

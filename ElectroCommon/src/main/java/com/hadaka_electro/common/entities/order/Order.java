@@ -96,4 +96,12 @@ public class Order {
     public void addOrderTrack(OrderTrack orderTrack) {
         this.orderTracks.add(orderTrack);
     }
+
+    public boolean hasStatus(OrderStatus orderStatus){
+        for(OrderTrack track : this.orderTracks) {
+            if(track.getStatus().equals(orderStatus))
+                return true;
+        }
+        return false;
+    }
 }
