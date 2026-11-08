@@ -18,8 +18,8 @@ public interface AddressBookRepository extends JpaRepository<Address, Integer> {
     Optional<Address> findByIdAndCustomerId(Integer id, Long customerId);
 
     @Modifying
-    @Query("UPDATE Address a SET a.defaultForShipping = true WHERE a.id = ?1")
-    void setDefaultAddress(Integer id);
+    @Query("UPDATE Address a SET a.defaultForShipping = true WHERE a.id = ?1 AND a.customer.id = ?2")
+    void setDefaultAddress(Integer id, Long customerId);
 
     @Modifying
     @Query("UPDATE Address a SET a.defaultForShipping = false WHERE a.id != ?1 AND a.customer.id = ?2")

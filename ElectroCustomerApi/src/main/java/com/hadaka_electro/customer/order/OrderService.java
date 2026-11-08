@@ -20,6 +20,7 @@ import com.hadaka_electro.customer.product.repository.ProductRepository;
 import com.hadaka_electro.customer.setting.SettingService;
 import com.hadaka_electro.customer.setting.repository.CountryRepository;
 import com.hadaka_electro.customer.setting.repository.SettingsRepository;
+import com.hadaka_electro.customer.shopping_cart.ShoppingCartService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,8 +53,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final SettingsRepository settingsRepository;
+    private final ShoppingCartService shoppingCartService;
 
-    public OrderService(CustomerService customerService, CheckoutService checkoutService, OrderRepository orderRepository, ProductRepository productRepository, SettingsRepository settingsRepository, CountryRepository countryRepository, SettingService settingService, CustomerRepository customerRepository, OrderMapper orderMapper) {
+    public OrderService(CustomerService customerService, CheckoutService checkoutService, OrderRepository orderRepository, ProductRepository productRepository, SettingsRepository settingsRepository, CountryRepository countryRepository, SettingService settingService, CustomerRepository customerRepository, OrderMapper orderMapper, ShoppingCartService shoppingCartService) {
         this.customerService = customerService;
         this.checkoutService = checkoutService;
         this.orderRepository = orderRepository;
@@ -63,6 +65,7 @@ public class OrderService {
         this.settingService = settingService;
         this.customerRepository = customerRepository;
         this.orderMapper = orderMapper;
+        this.shoppingCartService = shoppingCartService;
     }
 
     @Transactional
@@ -127,7 +130,9 @@ public class OrderService {
         order.addOrderTrack(orderTrack);
 
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        shoppingCartService.removeAllByCustomer(customerEmail);
+        return savedOrder;
     }
 
     @Async

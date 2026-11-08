@@ -55,7 +55,12 @@ public class CustomerService {
     }
 
     @Transactional
-    public void updateCustomer(CustomerDTO customerDTO) {
+    public void updateCustomer(CustomerDTO customerDTO, String authenticatedEmail) {
+        Customer authenticatedCustomer = getCustomerByEmail(authenticatedEmail);
+        if (!authenticatedCustomer.getId().equals(customerDTO.getId())
+                || !authenticatedCustomer.getEmail().equalsIgnoreCase(customerDTO.getEmail())) {
+            throw new SecurityException("You do not have permission to update this customer.");
+        }
         Customer customer = customerMapper.toEntity(customerDTO);
 
         customerRepository.save(customer);

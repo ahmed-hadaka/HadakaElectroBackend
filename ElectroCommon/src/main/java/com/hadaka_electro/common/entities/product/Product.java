@@ -105,7 +105,7 @@ public class Product extends AbstractAuditableEntity {
     }
 
     public double getPriceAfterDiscount() {
-        return price -= (price * (discountPercent / 100));
+        return price - (price * (discountPercent / 100));
     }
 
 

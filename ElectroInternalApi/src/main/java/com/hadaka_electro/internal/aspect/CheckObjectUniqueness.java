@@ -21,6 +21,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -48,7 +49,7 @@ public class CheckObjectUniqueness {
 
         Optional<Brand> brand = brandRepository.findByName(brandDTO.getName());
         if (brand.isPresent()) {
-            if (brand.get().getId() != brandDTO.getId()) {
+            if (!Objects.equals(brand.get().getId(), brandDTO.getId())) { // cuz, brandDTO's id is non-primitive data type
                 throw new DuplicatedObjectException("The brand name " + brandDTO.getName() + " is already taken!");
             }
         }
@@ -62,13 +63,13 @@ public class CheckObjectUniqueness {
         Optional<Category> category1 = categoryRepository.findByName(categoryDTO.getName());
 
         if (category1.isPresent()) {
-            if (category1.get().getId() != categoryDTO.getId()) { // edit mode
+            if (!Objects.equals(category1.get().getId(), categoryDTO.getId())) { // edit mode
                 throw new DuplicatedObjectException("The NAME is Duplicated!");
             }
         }
         Optional<Category> category2 = categoryRepository.findByAlias(categoryDTO.getAlias());
         if (category2.isPresent()) {
-            if (category2.get().getId() != categoryDTO.getId()) { // edit mode
+            if (!Objects.equals(category2.get().getId(), categoryDTO.getId())) { // edit mode
                 throw new DuplicatedObjectException("The ALIAS is Duplicated!");
             }
         }
@@ -125,4 +126,3 @@ public class CheckObjectUniqueness {
         }
     }
 }
-

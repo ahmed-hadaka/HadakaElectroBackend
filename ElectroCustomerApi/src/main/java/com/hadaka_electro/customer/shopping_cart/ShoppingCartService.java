@@ -54,7 +54,7 @@ public class ShoppingCartService {
                     item.getQuantity()
             );
 
-        }).collect(Collectors.toList());
+        }).filter(java.util.Objects::nonNull).collect(Collectors.toList());
     }
 
     @Transactional

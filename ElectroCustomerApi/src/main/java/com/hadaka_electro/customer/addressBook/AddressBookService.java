@@ -75,8 +75,11 @@ public class AddressBookService {
     @Transactional
     public void setDefaultAddress(Integer defaultAddressId, String customerEmail) {
         Customer customer = getCustomer(customerEmail);
-        addressRepository.setDefaultAddress(defaultAddressId);
+        addressRepository.findByIdAndCustomerId(defaultAddressId, customer.getId())
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        "Address not found or you do not have permission to modify it."));
         addressRepository.setNonDefaultForOthers(defaultAddressId, customer.getId());
+        addressRepository.setDefaultAddress(defaultAddressId, customer.getId());
     }
 
     private Customer getCustomer(String email) {

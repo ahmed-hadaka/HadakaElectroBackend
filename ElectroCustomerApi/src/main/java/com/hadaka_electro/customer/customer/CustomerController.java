@@ -4,9 +4,11 @@ import com.hadaka_electro.common.entities.Customer;
 import com.hadaka_electro.common.entities.setting.Country;
 import com.hadaka_electro.customer.customer.repository.CustomerDTO;
 import com.hadaka_electro.customer.customer.repository.ResetPasswordRequest;
+import com.hadaka_electro.customer.security.CustomerUserDetails;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,13 +32,27 @@ public class CustomerController {
     }
 
     @GetMapping("/{email}")
-    public ResponseEntity<CustomerDTO> getCustomerDetails(@PathVariable("email") String customerEmail) {
+    public ResponseEntity<CustomerDTO> getCustomerDetails(@PathVariable("email") String customerEmail,
+                                                           @AuthenticationPrincipal CustomerUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        if (!userDetails.getUsername().equalsIgnoreCase(customerEmail)) {
+            return ResponseEntity.status(403).build();
+        }
         return ResponseEntity.ok(customerService.getCustomerDetails(customerEmail));
     }
 
     @PostMapping("/update-customer")
-    public ResponseEntity<Map<String, String>> updateCustomer(@RequestBody @Valid CustomerDTO customerDTO) throws MessagingException {
-        customerService.updateCustomer(customerDTO);
+    public ResponseEntity<Map<String, String>> updateCustomer(@RequestBody @Valid CustomerDTO customerDTO,
+                                                               @AuthenticationPrincipal CustomerUserDetails userDetails) throws MessagingException {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        if (!userDetails.getUsername().equalsIgnoreCase(customerDTO.getEmail())) {
+            return ResponseEntity.status(403).build();
+        }
+        customerService.updateCustomer(customerDTO, userDetails.getUsername());
 
         return ResponseEntity.ok(Map.of("message", "Updated successfully"));
     }

@@ -55,7 +55,13 @@ public class WebSecurityConfigs {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // creates session on login
                 )
                 .authorizeHttpRequests(request ->
-                        request.anyRequest().permitAll())
+                        request
+                                .requestMatchers("/auth/**", "/", "/list-categories",
+                                        "/products/**", "/general-settings",
+                                        "/customers/register", "/customers/save-customer",
+                                        "/customers/verify", "/customers/request-password-reset",
+                                        "/customers/reset-password").permitAll()
+                                .anyRequest().authenticated())
                 .rememberMe(rememberMe ->
                         rememberMe.rememberMeServices(rememberMeServices()));
 
