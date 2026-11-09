@@ -60,7 +60,9 @@ public class WebSecurityConfigs {
                                         "/products/**", "/general-settings",
                                         "/customers/register", "/customers/save-customer",
                                         "/customers/verify", "/customers/request-password-reset",
-                                        "/customers/reset-password").permitAll()
+                                        "/customers/reset-password","/default_images/**",
+                                        "/category_images/**", "/brand_logos/**",
+                                        "/product_images/**").permitAll()
                                 .anyRequest().authenticated())
                 .rememberMe(rememberMe ->
                         rememberMe.rememberMeServices(rememberMeServices()));

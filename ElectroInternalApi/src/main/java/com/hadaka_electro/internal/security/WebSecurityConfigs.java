@@ -56,7 +56,7 @@ public class WebSecurityConfigs {
 			)
 			.authorizeHttpRequests(request -> request
 			.requestMatchers("/auth/**").permitAll()
-			.requestMatchers("/user_photos/**", "/brand_logos", "/categories_images", "/default_images","/product_images").permitAll()
+			.requestMatchers("/user_photos/**", "/brand_logos/**", "/categories_images/**", "/default_images/**","/product_images/**").permitAll()
             .requestMatchers("/settings/general", "/settings/countries","/settings/states/**","/users/me").hasAnyAuthority("Editor","Salesperson","Shipper","Assistant","Admin")
             .requestMatchers("/users/**","/settings/**").hasAuthority("Admin")
 			.requestMatchers("/products/edit/**", "/products/save-product").hasAnyAuthority("Admin","Editor","Salesperson")

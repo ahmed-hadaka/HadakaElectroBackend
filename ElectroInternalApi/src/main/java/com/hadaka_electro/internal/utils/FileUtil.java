@@ -15,7 +15,6 @@ public class FileUtil {
     public static void saveFile(String dirName, String fileName, MultipartFile multipartFile) throws IOException {
 
         try {
-
             Path completePath = Paths.get(dirName.toString());
 
             if (!Files.exists(completePath))
