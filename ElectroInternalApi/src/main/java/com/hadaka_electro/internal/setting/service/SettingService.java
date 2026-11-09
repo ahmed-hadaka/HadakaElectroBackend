@@ -91,6 +91,7 @@ public class SettingService {
             String uploadDir = "default_images/siteLogos";
             String fileName = StringUtils.cleanPath(siteLogoFile.getOriginalFilename());
             try {
+                FileUtil.cleanDir(uploadDir);
                 FileUtil.saveFile(uploadDir, fileName, siteLogoFile);
             } catch (IOException e) {
                 throw new FileStorageException("Could not store site logo " + fileName + ". Please try again! " + e);
