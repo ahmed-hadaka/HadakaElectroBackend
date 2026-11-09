@@ -112,4 +112,4 @@ By entirely decoupling the internal management operations from the customer-faci
 4. The API will be available at `http://localhost:8080/ElectroAdmin` (or the configured context path).
 
 ## 📄 API Documentation
-For a complete list of endpoints, request payloads, and response structures, please see the [API Documentation](docs/API_Documentation.md) included in this repository.
+For a complete list of endpoints, request payloads, and response structures, please see the [Customer Backend API Documentation](https://github.com/ahmed-hadaka/HadakaElectroBackend/blob/main/ElectroCustomerApi/docs/customer-api-docs.md) & [Internal Backend API Documentation](https://github.com/ahmed-hadaka/HadakaElectroBackend/blob/main/ElectroInternalApi/docs/internal-api-docs.md) included in this repository.
