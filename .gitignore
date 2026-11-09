@@ -16,6 +16,7 @@ build/
 !/.mvn/wrapper/maven-wrapper.jar
 
 *.png
+/*.png
 
 default_images/
 uploads/
