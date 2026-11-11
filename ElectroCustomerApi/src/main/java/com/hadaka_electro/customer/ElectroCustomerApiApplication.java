@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 })
 @ComponentScan(basePackages = {
         "com.hadaka_electro.customer",
-        "com.hadaka_electro.common.exception"
+        "com.hadaka_electro.common"
 })
 @EnableAsync
 public class ElectroCustomerApiApplication {

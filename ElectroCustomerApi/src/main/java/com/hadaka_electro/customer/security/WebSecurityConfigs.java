@@ -75,7 +75,7 @@ public class WebSecurityConfigs {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200")); // frontend Origin
+        config.setAllowedOrigins(List.of("https://hadaka-electro-front-hc6ro5qrq-anonymous903233-1285s-projects.vercel.app")); // frontend Origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -107,7 +107,6 @@ public class WebSecurityConfigs {
                 new TokenBasedRememberMeServices(rememberMeKey, customerUserDetailsService) {
                     @Override
                     protected boolean rememberMeRequested(HttpServletRequest request, String parameter) {
-                        // Check if our controller set the remember-me flag attribute
                         Boolean rememberMeAttr = (Boolean) request.getAttribute("REMEMBER_ME_REQUESTED");
                         return rememberMeAttr != null ? rememberMeAttr : super.rememberMeRequested(request, parameter);
                     }

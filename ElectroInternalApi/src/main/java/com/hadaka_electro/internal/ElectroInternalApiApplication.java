@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @EntityScan(basePackages = {"com.hadaka_electro.common.entities",
         "com.hadaka_electro.internal"})
-@ComponentScan(basePackages = {"com.hadaka_electro.internal", "com.hadaka_electro.common.exception"})
+@ComponentScan(basePackages = {"com.hadaka_electro.internal", "com.hadaka_electro.common"})
 public class ElectroInternalApiApplication {
 
     public static void main(String[] args) {
