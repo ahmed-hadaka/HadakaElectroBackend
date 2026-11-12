@@ -42,7 +42,12 @@ public class MvcConfig implements WebMvcConfigurer {
     }
 
     private void mappingHelper(ResourceHandlerRegistry registry, String resourceHandler, String resourceLocation) {
-        String uri = Paths.get(resourceLocation).toAbsolutePath().toUri().toString();
+        String uri;
+        if (resourceLocation.startsWith("http://") || resourceLocation.startsWith("https://")) {
+            uri = resourceLocation;
+        } else {
+            uri = Paths.get(resourceLocation).toAbsolutePath().toUri().toString();
+        }
         if (!uri.endsWith("/")) {
             uri += "/";
         }
