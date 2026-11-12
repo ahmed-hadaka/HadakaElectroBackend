@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.net.URI;
 import java.util.List;
 
 
@@ -32,6 +33,9 @@ public class WebSecurityConfigs {
     private final ElectroUserDetailsService electroUserDetailsService;
     @Value("${remember.me.key}")
     private String rememberMeKey;
+
+    @Value("${app.frontend.baseUrl}")
+    private String frontendBaseUrl;
 
     public WebSecurityConfigs(ElectroUserDetailsService electroUserDetailsService) {
         this.electroUserDetailsService = electroUserDetailsService;
@@ -91,8 +95,14 @@ public class WebSecurityConfigs {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        URI uri = URI.create(frontendBaseUrl.trim());
+        String cleanOrigin = uri.getScheme() + "://" + uri.getAuthority();
+
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://hadaka-electro-front-hc6ro5qrq-anonymous903233-1285s-projects.vercel.app")); // frontend Origin
+        config.setAllowedOrigins(List.of(
+                cleanOrigin,
+                "http://localhost:4200" // Keeps local Angular development working
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
