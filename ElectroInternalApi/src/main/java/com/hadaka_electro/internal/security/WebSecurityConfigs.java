@@ -16,6 +16,8 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,15 +40,20 @@ public class WebSecurityConfigs {
         this.electroUserDetailsService = electroUserDetailsService;
     }
     // @formatter:off
-	
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-//			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-//				 this enables cookie-based CSRF so React can read XSRF-TOKEN cookie
 
-				.cors(cors -> cors.disable())
-				.csrf(csrf -> csrf.disable())
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName("_csrf");
+
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//				 this enables cookie-based CSRF so React can read XSRF-TOKEN cookie
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(requestHandler))
+//				.cors(cors -> cors.disable())
+//				.csrf(csrf -> csrf.disable())
 			.sessionManagement(session -> session
 					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // creates session on login
 			)
@@ -89,7 +96,7 @@ public class WebSecurityConfigs {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of(
-                "https://hadaka-electro-front-end-blond.vercel.app/ElectroInternal",
+                "https://hadaka-electro-front-end-blond.vercel.app",
                 "https://*.vercel.app",
                 "http://localhost:4200"
         ));
