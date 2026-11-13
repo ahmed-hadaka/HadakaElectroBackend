@@ -73,7 +73,7 @@ public class WebSecurityConfigs {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of(
-                "https://hadaka-electro-front-end-blond.vercel.app",
+                "https://hadaka-electro-front-end-blond.vercel.app/ElectroCustomer",
                 "https://*.vercel.app",
                 "http://localhost:4200"
         ));
