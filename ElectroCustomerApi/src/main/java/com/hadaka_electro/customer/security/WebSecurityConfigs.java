@@ -22,7 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.net.URI;
 import java.util.List;
 
 @Configuration
@@ -78,14 +77,8 @@ public class WebSecurityConfigs {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        URI uri = URI.create(frontendBaseUrl.trim());
-        String cleanOrigin = uri.getScheme() + "://" + uri.getAuthority();
-
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                cleanOrigin,
-                "http://localhost:4200"
-        ));
+        config.setAllowedOrigins(List.of("https://hadaka-electro-front-end-blond.vercel.app")); // frontend Origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
