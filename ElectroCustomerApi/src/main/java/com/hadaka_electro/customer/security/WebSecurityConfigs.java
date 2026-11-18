@@ -82,6 +82,7 @@ public class WebSecurityConfigs {
         config.setAllowedOriginPatterns(List.of(
                 "https://hadaka-electro-front-end-blond.vercel.app",
                 "https://*.vercel.app",
+
                 "http://localhost:4200"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
