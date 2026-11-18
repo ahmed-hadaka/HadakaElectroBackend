@@ -9,7 +9,7 @@ import com.hadaka_electro.common.exception.ObjectNotFoundException;
 import com.hadaka_electro.internal.product.ProductMapper;
 import com.hadaka_electro.internal.product.repository.ProductImagesRepository;
 import com.hadaka_electro.internal.product.repository.ProductRepository;
-import com.hadaka_electro.internal.utils.FileUtil;
+import com.hadaka_electro.internal.utils.AmazonS3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,7 @@ import java.util.Set;
 @Transactional(readOnly = true)
 public class ProductService {
 
-    private ProductImagesRepository productImagesRepository;
+    private final ProductImagesRepository productImagesRepository;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
@@ -96,8 +96,8 @@ public class ProductService {
             savedProduct = productRepository.save(product);
             String uploadDir = "product_images/" + savedProduct.getId();
 
-            FileUtil.cleanDir(uploadDir);
-            FileUtil.saveFile(uploadDir, fileName, mainImage);
+            AmazonS3Util.removeFolder(uploadDir);
+            AmazonS3Util.uploadFile(uploadDir, fileName, mainImage.getInputStream());
 
         } else if (existedProduct.isPresent()) {
             product.setMainImage(existedProduct.get().getMainImage());
@@ -115,8 +115,8 @@ public class ProductService {
                 Set<ProductImages> curProductImages = savedProduct.getProductImages();
                 if (curProductImages != null) {
                     curProductImages.removeIf(productImage -> removedImagesNames.contains(productImage.getName()));
-                    String fileAbsolutePath = "E:/Intellij-workspace/HadakaElectroBackEnd/product_images/126/extras/";
-                    removedImagesNames.forEach(imageName -> FileUtil.removeFileIfExists(fileAbsolutePath + imageName));
+                    String fileAbsolutePath = "product_images/126/extras/";
+                    removedImagesNames.forEach(imageName -> AmazonS3Util.deleteFile(fileAbsolutePath + imageName));
                 }
             }
         }
@@ -131,7 +131,7 @@ public class ProductService {
                 String fileName = StringUtils.cleanPath(extraImage.getOriginalFilename());
                 ProductImages productImage = new ProductImages(fileName, savedProduct);
                 newProductImages.add(productImage);
-                FileUtil.saveFile(uploadDir, fileName, extraImage);
+                AmazonS3Util.uploadFile(uploadDir, fileName, extraImage.getInputStream());
             }
 
             // supposing that dirt check will save productImages to product entity inside single transaction
@@ -156,7 +156,7 @@ public class ProductService {
     public void deleteProduct(int id) throws Exception {
         if (productRepository.countById(id) > 0) {
             productRepository.deleteById(id);
-            FileUtil.deletePhotosDir("product_images/", id);
+            AmazonS3Util.removeFolder("product_images/" + id);
         } else {
             throw new ObjectNotFoundException("No product found with ID: " + id);
         }

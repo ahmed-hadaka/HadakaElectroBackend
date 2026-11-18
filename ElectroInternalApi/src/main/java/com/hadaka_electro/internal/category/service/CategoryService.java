@@ -9,7 +9,7 @@ import com.hadaka_electro.internal.category.dto.CategoryListDTO;
 import com.hadaka_electro.internal.category.dto.CategorySelectDTO;
 import com.hadaka_electro.internal.category.repository.CategoryRepository;
 import com.hadaka_electro.internal.product.repository.ProductRepository;
-import com.hadaka_electro.internal.utils.FileUtil;
+import com.hadaka_electro.internal.utils.AmazonS3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +29,10 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private List<CategorySelectDTO> HierarchicalCategoriesList = new ArrayList<>();
-    private CategoryMapper categoryMapper;
-    private BrandRepository brandRepository;
-    private ProductRepository productRepository;
+    private final List<CategorySelectDTO> HierarchicalCategoriesList = new ArrayList<>();
+    private final CategoryMapper categoryMapper;
+    private final BrandRepository brandRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
     public CategoryService(CategoryRepository categoryRepository, ProductRepository productRepository, BrandRepository brandRepository, CategoryMapper categoryMapper) {
@@ -81,11 +81,10 @@ public class CategoryService {
 
 
             categoryRepository.save(category);
-            // category_images will be in the project directory cuz, will be globally accessible
             String uploadDir = "category_images/" + category.getId();
 
-            FileUtil.cleanDir(uploadDir);
-            FileUtil.saveFile(uploadDir, fileName, multipartFile);
+            AmazonS3Util.removeFolder(uploadDir);
+            AmazonS3Util.uploadFile(uploadDir, fileName, multipartFile.getInputStream());
 
         } else if (existedCategory.isPresent()) {
             category.setImage(existedCategory.get().getImage());
@@ -135,7 +134,7 @@ public class CategoryService {
         productRepository.detachCategoryFromProduct(categoryId);
         brandRepository.deleteCategoryAssociations(categoryId);
         categoryRepository.deleteById(categoryId);
-        FileUtil.deletePhotosDir("category_images/", categoryId);
+        AmazonS3Util.removeFolder("category_images/" + categoryId);
     }
 
     @Transactional

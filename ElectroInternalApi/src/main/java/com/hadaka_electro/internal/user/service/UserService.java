@@ -6,13 +6,12 @@ import com.hadaka_electro.common.exception.ObjectNotFoundException;
 import com.hadaka_electro.internal.user.UserDTO;
 import com.hadaka_electro.internal.user.UserMapper;
 import com.hadaka_electro.internal.user.repository.UserRepository;
-import com.hadaka_electro.internal.utils.FileUtil;
+import com.hadaka_electro.internal.utils.AmazonS3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -27,13 +26,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
     }
 
@@ -65,8 +62,8 @@ public class UserService {
 
         if (fileName != null) {
             String uploadDir = "user_photos/" + savedUser.getId();
-            FileUtil.cleanDir(uploadDir);
-            FileUtil.saveFile(uploadDir, fileName, multipartFile);
+            AmazonS3Util.removeFolder(uploadDir);
+            AmazonS3Util.uploadFile(uploadDir, fileName, multipartFile.getInputStream());
         }
     }
 
@@ -95,7 +92,7 @@ public class UserService {
     public void deleteUser(int id) throws Exception, ObjectNotFoundException {
         long c = userRepository.countById(id);
         if (c > 0) {
-            FileUtil.deletePhotosDir("user_photos/", id);
+            AmazonS3Util.removeFolder("user_photos/" + id);
             userRepository.deleteById(id);
         } else {
             throw new ObjectNotFoundException("User not found with id: " + id);

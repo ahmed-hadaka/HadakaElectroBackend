@@ -74,12 +74,12 @@ public class User {
         this.roles.add(role);
     }
 
-    public String getPhotoPath() {
-        if (photo == null || id == 0)
-            return "/assets/images/default-user.png";
-
-        return "./user_photos/" + this.id + "/" + photo;
-    }
+//    public String getPhotoPath() {
+//        if (photo == null || id == 0)
+//            return "/assets/images/default-user.png";
+//
+//        return "./user_photos/" + this.id + "/" + photo;
+//    }
 
     public String getFullName() {
         return firstName + " " + lastName;

@@ -7,9 +7,8 @@ import com.hadaka_electro.internal.brand.BrandMapper;
 import com.hadaka_electro.internal.brand.dto.BrandDTO;
 import com.hadaka_electro.internal.brand.dto.BrandListDTO;
 import com.hadaka_electro.internal.brand.repository.BrandRepository;
-import com.hadaka_electro.internal.category.repository.CategoryRepository;
 import com.hadaka_electro.internal.product.repository.ProductRepository;
-import com.hadaka_electro.internal.utils.FileUtil;
+import com.hadaka_electro.internal.utils.AmazonS3Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,14 +28,12 @@ import java.util.Optional;
 public class BrandService {
 
     private final BrandRepository brandRepository;
-    private final CategoryRepository categoryRepository;
     private final BrandMapper brandMapper;
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
-    public BrandService(BrandRepository brandRepository, ProductRepository productRepository, CategoryRepository categoryRepository, BrandMapper brandMapper) {
+    public BrandService(BrandRepository brandRepository, ProductRepository productRepository, BrandMapper brandMapper) {
         this.brandRepository = brandRepository;
-        this.categoryRepository = categoryRepository;
         this.brandMapper = brandMapper;
         this.productRepository = productRepository;
     }
@@ -86,8 +83,8 @@ public class BrandService {
             Brand savedBrand = brandRepository.save(brand);
             String uploadDir = "brand_logos/" + savedBrand.getId();
 
-            FileUtil.cleanDir(uploadDir);
-            FileUtil.saveFile(uploadDir, fileName, multipartFile);
+            AmazonS3Util.removeFolder(uploadDir);
+            AmazonS3Util.uploadFile(uploadDir, fileName, multipartFile.getInputStream());
         } else if (existedBrand.isPresent()) {
             brand.setLogo(existedBrand.get().getLogo());
             brandRepository.save(brand);
@@ -108,7 +105,7 @@ public class BrandService {
         if (brandRepository.countById(id) > 0) {
             productRepository.DeleteAssociatedBrands(id);
             brandRepository.deleteById(id);
-            FileUtil.deletePhotosDir("brand_logos/", id);
+            AmazonS3Util.removeFolder("brand_logos/" + id);
         } else
             throw new ObjectNotFoundException("No brand found with ID: " + id);
     }

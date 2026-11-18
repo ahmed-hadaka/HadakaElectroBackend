@@ -11,7 +11,7 @@ import com.hadaka_electro.internal.setting.repository.CountryRepository;
 import com.hadaka_electro.internal.setting.repository.CurrencyRepository;
 import com.hadaka_electro.internal.setting.repository.SettingRepository;
 import com.hadaka_electro.internal.setting.repository.StateRepository;
-import com.hadaka_electro.internal.utils.FileUtil;
+import com.hadaka_electro.internal.utils.AmazonS3Util;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -88,11 +88,11 @@ public class SettingService {
         updateSettings(generalSettings);
 
         if (siteLogoFile != null && !siteLogoFile.isEmpty()) {
-            String uploadDir = "default_images/siteLogos";
+            String uploadDir = "default_images";
             String fileName = StringUtils.cleanPath(siteLogoFile.getOriginalFilename());
             try {
-                FileUtil.cleanDir(uploadDir);
-                FileUtil.saveFile(uploadDir, fileName, siteLogoFile);
+                AmazonS3Util.deleteFile(uploadDir + "/siteLogo.png");
+                AmazonS3Util.uploadFile(uploadDir, fileName, siteLogoFile.getInputStream());
             } catch (IOException e) {
                 throw new FileStorageException("Could not store site logo " + fileName + ". Please try again! " + e);
             }
