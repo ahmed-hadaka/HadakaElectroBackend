@@ -89,6 +89,9 @@ By entirely decoupling the internal management operations from the customer-faci
 * **Database:** Hosted on **JawsDB MySQL** (Heroku Add-on).
 * **Media Storage:** Hosted on **AWS S3** (`eu-north-1`).
 
+  <img width="1460" height="610" alt="HadakaElectro Architecture Diagram drawio" src="https://github.com/user-attachments/assets/6c17982f-06fb-4ac1-834e-56eead673ec7" />
+
+
 ### Required Production Environment Variables (Heroku Config Vars)
 ```env
 PATH_TO_JAR=ElectroInternalApi/target/ElectroInternalApi-0.0.1-SNAPSHOT.jar
